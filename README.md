@@ -1,17 +1,28 @@
 # AI Business Autopilot
 
-A standalone FastAPI application for AI-assisted business operations, research, lead qualification, and review-gated workflows.
+Standalone FastAPI staging service for a future AI-assisted business operations workspace.
+
+## Current deployment status
+The staging dashboard is deployed as an isolated service at `https://fx.ketronics.co.ke/autopilot/`. It runs on loopback port 8092 and is routed through the existing FX Edge Nginx virtual host. The existing FX Edge application and API upstreams are not replaced.
+
+**This is a staging shell, not the complete Stage 9 application.** The full AI planner, database-backed jobs, OAuth/Gmail draft integration, research adapters, and full test suite have not yet been transferred into this repository or activated on the VPS. The planner endpoint intentionally returns a disabled response rather than pretending to perform AI work.
 
 ## Safety defaults
-- Outbound email is draft-only; the application does not send emails.
+- Outbound email is draft-only; this staging service does not send emails.
 - Sensitive, contractual, and financial actions require human review.
-- Opt-out and duplicate-send protections are part of the intended workflow policy.
-- Configure secrets through environment variables; never commit credentials or local databases.
+- No external actions are executed by the staging dashboard.
+- No AI provider key is currently configured.
+- The existing FX Edge Basic Auth gate also protects this subpath.
 
-## Project status
-This repository is being prepared for deployment at https://fx.ketronics.co.ke/autopilot/ as a separate application. It must not replace or modify FX Edge.
+## Run locally
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 8092
+```
 
-The application source bundle and its tests are maintained separately until the full source transfer is complete. Do not treat this repository as deployed until the VPS health checks and route verification have passed.
+Health endpoint: `/healthz`; readiness endpoint: `/readyz`; status endpoint: `/api/status`.
 
-## Security note
-This is a public repository. Do not put API keys, OAuth client secrets, JWT secrets, access tokens, customer data, or production database files in commits.
+## Public-repository security
+Never commit API keys, OAuth client secrets, JWT secrets, access tokens, customer data, `.env` files, or production databases.
