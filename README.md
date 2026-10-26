@@ -1,20 +1,31 @@
 # AI Business Autopilot
 
-Standalone FastAPI staging service for a future AI-assisted business operations workspace.
+A standalone FastAPI application for AI-assisted business planning, evidence-backed research, prospect qualification, freelance opportunity discovery, outreach drafting, and persistent task history.
 
-## Current deployment status
-The staging dashboard is deployed as an isolated service at `https://fx.ketronics.co.ke/autopilot/`. It runs on loopback port 8092 and is routed through the existing FX Edge Nginx virtual host. The existing FX Edge application and API upstreams are not replaced.
+## Deployed service
 
-**This is a staging shell, not the complete Stage 9 application.** The full AI planner, database-backed jobs, OAuth/Gmail draft integration, research adapters, and full test suite have not yet been transferred into this repository or activated on the VPS. The planner endpoint intentionally returns a disabled response rather than pretending to perform AI work.
+The app is served at `https://fx.ketronics.co.ke/autopilot/` through the existing FX Edge Nginx virtual host and its existing Basic Auth gate. The app binds only to loopback at `127.0.0.1:8092`; it does not replace FX Edge.
 
-## Safety defaults
-- Outbound email is draft-only; this staging service does not send emails.
-- Sensitive, contractual, and financial actions require human review.
-- No external actions are executed by the staging dashboard.
-- No AI provider key is currently configured.
-- The existing FX Edge Basic Auth gate also protects this subpath.
+## Features
 
-## Run locally
+- AI business planner with constraints, research context, prioritized actions, risks, and metrics.
+- Tavily-backed research with source URLs and an AI evidence summary.
+- AI prospect scoring and conversion recommendations.
+- Ranked freelance/contract opportunity discovery from web search results.
+- Personalized outreach email drafts saved to a persistent SQLite database.
+- Suppression list that blocks drafting to opted-out addresses.
+- Duplicate-recipient/subject draft protection for a 24-hour window.
+- Persistent task history and live metrics.
+- Safety defaults: no email sending; contracts, payments, financial actions, sensitive actions, and external commitments require human review.
+
+## Activate AI and search
+
+The service reads its private environment file at `/etc/ai-business-autopilot.env`. Set one supported LLM key (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, or `LLM_API_KEY`) and optionally set `LLM_MODEL` / `LLM_BASE_URL`. Set `TAVILY_API_KEY` (or `SEARCH_API_KEY`) to enable live research and job discovery. Never put secrets in this public repository.
+
+AI and search provider credentials are not present in the current server environment, so provider-dependent requests return a clear configuration error until credentials are installed. The dashboard, database, safety controls, and health/status endpoints are running.
+
+## Local run
+
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
@@ -22,7 +33,8 @@ pip install -r requirements.txt
 uvicorn main:app --host 127.0.0.1 --port 8092
 ```
 
-Health endpoint: `/healthz`; readiness endpoint: `/readyz`; status endpoint: `/api/status`.
+Health: `/healthz` · Readiness: `/readyz` · Status: `/api/status` · API docs: `/api/docs`.
 
-## Public-repository security
-Never commit API keys, OAuth client secrets, JWT secrets, access tokens, customer data, `.env` files, or production databases.
+## Security
+
+Never commit API keys, OAuth client secrets, access tokens, customer data, `.env` files, or production databases. Email sending is deliberately disabled; Gmail OAuth and live sending are not configured in this deployment.
